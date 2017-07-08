@@ -1,6 +1,6 @@
 const width = 900,
       height = 600,
-      radius = Math.min(width, height) / 2;
+      radius = Math.min(width, height) / 2 - 50;
 
 const pie = d3.pie()
       .sort(null)
@@ -36,7 +36,7 @@ const key = (d) => {
 }
 
 const color = d3.scaleOrdinal(d3.schemeCategory20);
-const domain = ["Java", "Go", "JavaScript","Coffe", "Node", "Schema", "Ruby", "PHP", "C++", "C", "Shell"];
+const domain = ["Java", "Go", "JavaScript", "Coffe", "Node", "Schema", "Ruby", "PHP", "C++", "C", "Shell", "R", "D", "Coffe1", "Node1", "Schema1", "Ruby1", "PHP1", "C++1", "C1", "Shell1", "R1", "D1"];
 
 function randomData () {
   let labels = domain;
@@ -107,19 +107,29 @@ function change (data) {
       const pos = outerArc.centroid(d);
       pos[0] = radius * (midAngle(d) < Math.PI ? 1 : -1);
       positions[i] = { pos };
+      console.log(pos[1], d.data.label)
       if (i !== 0) {
         const pre = positions[i - 1].pos;
         if (pre[0] === pos[0]) {
           const distance = pos[1] - pre[1];
-          if (-20 < distance && distance < 20) {
-            yOffset = distance > 0 ? 20 - distance : -(20 + distance);
-            pos[1] += yOffset;
-            positions[i].pos = pos;
-            positions[i].yOffset = yOffset;
+          if (-25 < distance && distance < 25) {
+            yOffset = pos[0] > 0 ? 25 - distance : -(25 + distance);
+            if (pre.yOffset) {
+              yOffset = distance > 0 ? yOffset + pre.yOffset : yOffset - pre.yOffset;
+            }
+          } else {
+            if(pre[0] > 0 && distance < 0) {
+              yOffset = -distance + 25;
+            } else if (pre[0] < 0 && distance > 0){
+              yOffset = -distance - 25;
+            }
           }
+          pos[1] += yOffset;
+          positions[i].pos = pos;
+          positions[i].yOffset = yOffset;
         }
       }
-			return function(t) {
+			return (t) => {
 				const d3 = interpolate(t);
 				const pos = outerArc.centroid(d3);
 				pos[0] = radius * (midAngle(d3) < Math.PI ? 1 : -1);
